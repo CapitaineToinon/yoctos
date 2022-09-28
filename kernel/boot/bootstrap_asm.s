@@ -5,14 +5,15 @@ extern kernel_main
 STACK_SIZE                equ 0x100000     ; 1MB of stack
 
 ; Values for the multiboot header
-MULTIBOOT_MAGIC        equ 0x1BADB002  ; multiboot magic value
-MULTIBOOT_ALIGN        equ 1   ; load kernel and modules on page boundary
-MULTIBOOT_MEMINFO      equ 2   ; provide kernel with memory info
+MULTIBOOT_MAGIC			equ 0x1BADB002	; multiboot magic value
+MULTIBOOT_ALIGN			equ 1	; load kernel and modules on page boundary
+MULTIBOOT_MEMINFO		equ 2	; provide kernel with memory info
+MULTIBOOT_VIDEO_MODE	equ 4	; ask grub to switch to SVGA graphics modes
 
-MULTIBOOT_FLAGS        equ (MULTIBOOT_ALIGN|MULTIBOOT_MEMINFO)
+MULTIBOOT_FLAGS			equ (MULTIBOOT_ALIGN|MULTIBOOT_MEMINFO|MULTIBOOT_VIDEO_MODE)
 
 ; Magic + checksum + flags must equal 0!
-MULTIBOOT_CHECKSUM     equ -(MULTIBOOT_MAGIC + MULTIBOOT_FLAGS)
+MULTIBOOT_CHECKSUM		equ -(MULTIBOOT_MAGIC + MULTIBOOT_FLAGS)
 
 ;---------------------------------------------------------------------------------------------------
 ; .multiboot section
@@ -32,6 +33,12 @@ dd 0x00000000    ; load_addr
 dd 0x00000000    ; load_end_addr
 dd 0x00000000    ; bss_end_addr
 dd 0x00000000    ; entry_addr
+
+; for MULTIBOOT_VIDEO_MODE
+dd 0x00000000 ; mode_type
+dd 640 ; width
+dd 480 ; height
+dd 16 ; depth
 
 entrypoint:
 		; Bootloader code starts executing here
