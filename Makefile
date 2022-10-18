@@ -85,6 +85,7 @@ $(ISO_NAME): msg $(GRUB_CONF) kernel
 	mkdir -p build/boot/grub build/data/
 	cp $(GRUB_CONF) build/boot/grub/
 	cp kernel/kernel.elf build/boot/
+	cp resources/* build/boot/
 	grub-mkrescue $(GRUB_MKRESCUE_ARGS) -o $@ build
 	@echo "Built the $@ image for a $(SYSTEM) system."
 

@@ -12,6 +12,10 @@
 #define LINES 30
 #define PRINTF_BUFFER_MAX 512
 
+int get_xcursor();
+int get_ycursor();
+void set_cursor(int x, int y);
+void set_pixel(uint16_t, uint16_t, uint16_t);
 void set_color(int text, int background);
 void set_text_color(int color);
 void set_background_color(int color);

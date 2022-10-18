@@ -12,6 +12,22 @@ uint16_t get_pixel(uint16_t x, uint16_t y);
 void new_line();
 void print_char(char c);
 
+int get_xcursor()
+{
+    return xcursor;
+}
+
+int get_ycursor()
+{
+    return ycursor;
+}
+
+void set_cursor(int x, int y)
+{
+    xcursor = x;
+    ycursor = y;
+}
+
 void set_color(int text, int background)
 {
     set_text_color(text);

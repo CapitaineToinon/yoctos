@@ -16,4 +16,3 @@ typedef unsigned long long ulong_t;
 #define UNUSED(x) ((void)(x))
 
 #endif
-
