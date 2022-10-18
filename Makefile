@@ -1,7 +1,7 @@
 SYSTEM?=UEFI
 PLATFORM?=QEMU
 
-QEMU=qemu-system-x86_64 -enable-kvm -m 2048 -monitor stdio -vga virtio
+QEMU=qemu-system-x86_64 -enable-kvm -m 512 -monitor stdio -vga virtio
 
 ISO_NAME=yoctos.iso
 
@@ -85,7 +85,6 @@ $(ISO_NAME): msg $(GRUB_CONF) kernel
 	mkdir -p build/boot/grub build/data/
 	cp $(GRUB_CONF) build/boot/grub/
 	cp kernel/kernel.elf build/boot/
-	cp resources/* build/boot/
 	grub-mkrescue $(GRUB_MKRESCUE_ARGS) -o $@ build
 	@echo "Built the $@ image for a $(SYSTEM) system."
 
@@ -96,9 +95,9 @@ kernel:
 	$(MAKE) -C $@ CC_DEFINES=$(CC_DEFINES) CC_FLAGS="$(CC_FLAGS)" LD_FLAGS="$(LD_FLAGS)"
 
 deploy: $(ISO_NAME)
-	sudo dd if=/dev/urandom of=$(DEV) bs=1M count=10
-	sudo dd if=$< of=$(DEV)
-	sudo sync
+	 sudo dd if=/dev/urandom of=$(DEV) bs=1M count=10
+	 sudo dd if=$< of=$(DEV)
+	 sudo sync
 
 clean:
 	/bin/rm -rf build $(ISO_NAME)

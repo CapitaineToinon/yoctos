@@ -13,7 +13,7 @@ all: $(OBJ)
 	nasm -f elf32 $< -o $@
 
 clean:
-	find . -name "*.o" -delete -or -name "*.d" -delete
+	/bin/rm -f $(OBJ) $(DEP)
 
 .PHONY: clean
 

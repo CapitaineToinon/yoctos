@@ -23,4 +23,18 @@
 #define LIGHT_GREEN  RGB(150,220,150)
 #define LIGHT_RED    RGB(255,200,200)
 
+/*
+typedef enum {
+	MAGENTA = 5,
+	BROWN = 6,
+	LIGHT_CYAN = 11,
+	LIGHT_MAGENTA = 13,
+} term_colortype_t;
+*/
+
+typedef struct {
+	uint16_t fg;  // foreground color
+	uint16_t bg;  // background color
+} term_colors_t;
+
 #endif

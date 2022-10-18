@@ -1,58 +1,43 @@
-#include "drivers/display.h"
-#include "drivers/image.h"
+#include "common/string.h"
+#include "common/stdio.h"
+#include "common/mem.h"
 #include "boot/module.h"
+#include "boot/multiboot.h"
+#include "drivers/vbe.h"
+#include "drivers/term.h"
 #include "mem/gdt.h"
+#include "mem/paging.h"
+#include "x86.h"
 
 // These are defined in the linker script: kernel.ld
 extern void ld_kernel_start();
 extern void ld_kernel_end();
+uint_t kernel_start = (uint_t)&ld_kernel_start;
+uint_t kernel_end = (uint_t)&ld_kernel_end;
 
-static intptr_t kernel_start = (intptr_t)&ld_kernel_start;
-static intptr_t kernel_end = (intptr_t)&ld_kernel_end;
+void kernel_main(multiboot_info_t *mbi) {
+    multiboot_set_info(mbi);
+    uint_t RAM_in_KB = multiboot_get_RAM_in_KB();
 
-void kernel_main(multiboot_info_t *mbi)
-{
-	multiboot_set_info(mbi);
-	gdt_init();
+    gdt_init();
 
-	printf("YoctOS started\n");
-	printf("VBE mode %dx%d %dbpp intitialized (addr=0x%x, pitch=%d)\n",
-		   mbi->framebuffer_width,
-		   mbi->framebuffer_height,
-		   mbi->framebuffer_bpp,
-		   mbi->framebuffer_addr,
-		   mbi->framebuffer_pitch);
+	// This function must be initialized first! (before using any term_xxx functions!)
+	vbe_init();
+	vbe_fb_t *fb = vbe_get_fb();
 
-	printf("Detected %d of RAM\n",
-		   multiboot_get_RAM_in_KB());
+    // TODO: uncomment the line below once paging_init is implemented.
+    //paging_init(RAM_in_KB);  // must be called AFTER vbe_init()!    
+	
+	term_init();
+	term_printf("YoctOS started\n");
+	term_printf("VBE mode %dx%d %dbpp initialized (addr=0x%x, pitch=%d).\n", fb->width, fb->height, fb->bpp, fb->addr, fb->pitch_in_bytes);
+	term_printf("Detected %dKB of RAM.\n", RAM_in_KB);
+	term_printf("Kernel loaded at [0x%x-0x%x], size=%dKB\n", kernel_start, kernel_end, (kernel_end-kernel_start)/1024);
 
-	printf("Kernel loaded at [0x%x-0x%x]\n",
-		   kernel_start,
-		   kernel_end);
+    modules_display_info();
 
-	multiboot_uint32_t count = get_module_count();
-	printf("%d module(s) found\n", count);
+    // TODO: draw stuff at the framebuffer's new virtual address to validate mapping code works!
 
-	set_text_color(GREEN);
-	printf("---------------------\n");
-	printf("Welcome to YoctOS !!!\n");
-	printf("---------------------\n\n");
-	set_text_color(WHITE);
-
-	printf("Color tests:\n");
-	set_color(YELLOW, RED);
-	printf("Yellow text on red background\n");
-	set_color(BLACK, BLUE);
-	printf("Black text on blue background\n");
-
-	set_color(WHITE, BLACK);
-	for (multiboot_uint32_t i = 0; i < count; i++)
-	{
-		multiboot_module_t *module = get_module(i);
-		printf("Module %d addr=0x%x, size=%d cmdline=\"%s\"\n", i, module->mod_start, module->mod_end - module->mod_start, module->cmdline);
-
-		uint8_t *image = (uint8_t *)module->mod_start;
-		print_image(image, (const char *)module->cmdline);
-	}
+    term_printf("\nSystem halted.");
 	halt();
 }
