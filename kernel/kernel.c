@@ -16,6 +16,21 @@ extern void ld_kernel_end();
 uint_t kernel_start = (uint_t)&ld_kernel_start;
 uint_t kernel_end = (uint_t)&ld_kernel_end;
 
+uint16_t *get_fucking_pixel_addr(uint16_t x, uint16_t y)
+{
+	uint16_t *fb = (uint16_t *)((intptr_t)(3 * 1024 * 1024));
+	
+	multiboot_info_t *mbi = multiboot_get_info();
+	uint16_t pitch_width = (mbi->framebuffer_pitch * 8) / mbi->framebuffer_bpp;
+	return fb + x + (pitch_width * (y));
+}
+
+void set_my_fucking_pixel(uint16_t x, uint16_t y, uint16_t color)
+{
+	uint16_t *p = get_fucking_pixel_addr(x, y);
+	*p = color;
+}
+
 void kernel_main(multiboot_info_t *mbi)
 {
 	multiboot_set_info(mbi);
@@ -27,18 +42,9 @@ void kernel_main(multiboot_info_t *mbi)
 	vbe_init();
 	vbe_fb_t *fb = vbe_get_fb();
 
-	// TODO: uncomment the line below once paging_init is implemented.
-	// paging_init(RAM_in_KB); // must be called AFTER vbe_init()!
-
 	term_init();
-	frame_init(RAM_in_KB);
 
-	uint32_t *p = frame_alloc();
-	term_printf("0x%x\n", p);
-
-	uint32_t *p2 = frame_alloc();
-	frame_free(p2);
-	uint32_t *p3 = frame_alloc();
+	paging_init(RAM_in_KB); // must be called AFTER vbe_init()!
 
 	term_printf("YoctOS started\n");
 	term_printf("VBE mode %dx%d %dbpp initialized (addr=0x%x, pitch=%d).\n", fb->width, fb->height, fb->bpp, fb->addr, fb->pitch_in_bytes);
@@ -51,6 +57,14 @@ void kernel_main(multiboot_info_t *mbi)
 	modules_display_info();
 
 	// TODO: draw stuff at the framebuffer's new virtual address to validate mapping code works!
+
+	for (int y = 0; y < 100; y++)
+	{
+		for (int x = 0; x < 100; x++)
+		{
+			set_my_fucking_pixel(x, y, RED);
+		}
+	}
 
 	term_printf("\nSystem halted.");
 	halt();

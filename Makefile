@@ -34,8 +34,8 @@ $(error invalid PLATFORM)
 endif
 
 ifeq ($(DEBUG),0)
-CC_FLAGS=-O3
-LD_FLAGS=
+CC_FLAGS=-g -O0
+LD_FLAGS=-g
 else
 CC_FLAGS=-g -O0
 LD_FLAGS=-g
