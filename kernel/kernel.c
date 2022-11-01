@@ -47,9 +47,12 @@ void kernel_main(multiboot_info_t *mbi)
 
 	set_color(WHITE, BLACK);
 
-	multiboot_module_t *module = get_module(0);
-	image_pixel_t *image = (image_pixel_t *)module->mod_start;
-	print_image(image, (const char *)module->cmdline);
+	multiboot_module_t *module_text = get_module(1);
+	printf("%s\n", (const char *)module_text->mod_start);
+
+	multiboot_module_t *module_image = get_module(0);
+	image_pixel_t *image = (image_pixel_t *)module_image->mod_start;
+	print_image(image, (const char *)module_image->cmdline);
 
 	halt();
 }
