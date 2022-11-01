@@ -1,34 +1,33 @@
 #include "image.h"
 
-void print_image(uint8_t *image, const char *size)
+void print_image(image_pixel_t *image, const char *size)
 {
-    uint_t color_size = 3;
-    uint_t width, height;
-    uint_t space_offset = 0;
-    uint_t len = strlen(size);
+    int width, height;
+    int space_offset = 0;
+    int len = strlen(size);
 
     do
     {
         space_offset++;
     } while ((size[space_offset]) != ' ' && space_offset < len);
 
-    width = atoi(size);
-    height = atoi(size + space_offset + 1);
+    width = (int)atoi(size);
+    height = (int)atoi(size + space_offset + 1);
 
     printf("%d, %d\n", width, height);
+    printf("%d\n", width * height);
+    printf("sizeof(image_pixel_t) = %d\n", sizeof(image_pixel_t));
 
-    int xcursor = get_xcursor();
-    int ycursor = get_ycursor();
+    int start_x = get_xcursor() * FONT_WIDTH;
+    int start_y = get_ycursor() * FONT_HEIGHT;
 
-    for (uint_t y = 0; y < height; y++)
+    for (int y = 0; y < height; y++)
     {
-        for (uint_t x = 0; x < width; x++)
+        for (int x = 0; x < width; x++)
         {
-            uint_t offset = (uint_t)(x + (y * width)) * color_size;
-            uint8_t r = *(image + offset);
-            uint8_t g = *(image + offset + 1);
-            uint8_t b = *(image + offset + 2);
-            set_pixel((uint16_t)x, (uint16_t)y, RGB(r, g, b));
+            int i = x + (width * y);
+            image_pixel_t *pixel = image + i;
+            set_pixel((uint16_t)start_x + x, (uint16_t)start_y + y, RGB(pixel->r, pixel->g, pixel->b));
         }
     }
 }

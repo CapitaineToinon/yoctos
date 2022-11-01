@@ -46,13 +46,10 @@ void kernel_main(multiboot_info_t *mbi)
 	printf("Black text on blue background\n");
 
 	set_color(WHITE, BLACK);
-	for (multiboot_uint32_t i = 0; i < count; i++)
-	{
-		multiboot_module_t *module = get_module(i);
-		printf("Module %d addr=0x%x, size=%d cmdline=\"%s\"\n", i, module->mod_start, module->mod_end - module->mod_start, module->cmdline);
 
-		uint8_t *image = (uint8_t *)module->mod_start;
-		print_image(image, (const char *)module->cmdline);
-	}
+	multiboot_module_t *module = get_module(0);
+	image_pixel_t *image = (image_pixel_t *)module->mod_start;
+	print_image(image, (const char *)module->cmdline);
+
 	halt();
 }

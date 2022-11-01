@@ -5,6 +5,14 @@
 #include "common/string.h"
 #include "common/types.h"
 
-void print_image(uint8_t *image, const char *size);
+struct image_pixel
+{
+	uint8_t r;
+	uint8_t g;
+	uint8_t b;
+};
+typedef struct image_pixel image_pixel_t;
+
+void print_image(image_pixel_t *image, const char *size);
 
 #endif
