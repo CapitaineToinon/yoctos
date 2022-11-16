@@ -26,7 +26,7 @@ extern uint_t module_size(uint_t index);
 // Returns a module's command line.
 // Returns NULL if the module's command line is empty.
 // Note: first module is at index 0.
-extern char* module_cmdline(uint_t index);
+extern char *module_cmdline(uint_t index);
 
 // Displays modules' information:
 // - number of detected modules

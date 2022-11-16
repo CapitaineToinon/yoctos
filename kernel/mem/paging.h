@@ -89,6 +89,10 @@ typedef struct
 	uint32_t frame_base_addr : 20;
 } __attribute__((packed)) PTE_t;
 
+// Setup the kernel page directory with the following two mappings:
+// - Identity map the available RAM so that the kernel can access it as if there was no paging.
+// - Identity map the VBE framebuffer.
+// Then, loads the page directory and activate paging.
 extern void paging_init(uint_t RAM_in_KB);
 
 // Maps, in the specified page directory, size bytes starting at virtual address virt_addr

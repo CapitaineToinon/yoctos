@@ -20,4 +20,21 @@ extern void term_printf(char *fmt, ...);
 extern void term_getcursor(int *x, int *y);
 extern void term_setcursor(int x, int y);
 
+// For debugging purposes
+#define PRINT_INT(integer, color)             \
+	{                                         \
+		term_colors_t col = term_getcolors(); \
+		term_setfgcolor(color);               \
+		term_printf("{%d}", integer);         \
+		term_setcolors(col);                  \
+	}
+
+#define PRINT_STR(string, color)              \
+	{                                         \
+		term_colors_t col = term_getcolors(); \
+		term_setfgcolor(color);               \
+		term_puts(string);                    \
+		term_setcolors(col);                  \
+	}
+
 #endif
