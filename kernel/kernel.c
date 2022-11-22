@@ -44,11 +44,11 @@ void kernel_main(multiboot_info_t *mbi)
     modules_display_info();
 
     // New things
-    sti();
     pic_init();
     idt_init();
-    timer_init(50);
+    timer_init(500);
     keyb_init();
+    sti();
 
     // Code to test keyboard functions and exceptions support.
     term_setfgcolor(LIGHT_GREEN);
