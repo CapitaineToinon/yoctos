@@ -35,7 +35,7 @@ void timer_init(uint_t freq_hz)
     freq = freq_hz <= (uint_t)MIN_FREQ ? MIN_FREQ : freq_hz;
     uint_t divider = freq_hz < (uint_t)MIN_FREQ ? 0 : MAX_FREQ / freq_hz;
 
-    outb(PIT_COMMAND, 36);
+    outb(PIT_COMMAND, 0x36);
     outb(PIT_CHANNEL0, (uint8_t)divider);
     outb(PIT_CHANNEL0, (uint8_t)(divider >> 8));
 
