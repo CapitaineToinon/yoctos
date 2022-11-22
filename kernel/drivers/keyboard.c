@@ -22,25 +22,39 @@
 
 extern keymap_t *keymap;
 
-#define BUFFER_SIZE 256
+#define BUFFER_SIZE 5
 uint16_t buffer[BUFFER_SIZE];
-uint16_t index = 0;
-bool shift = false;
+uint16_t producer = 0;
+uint16_t consumer = 0;
+
+bool shift_left = false;
+bool shift_right = false;
 
 static void keyboard_handler()
 {
-    // TODO
     uint8_t data = inb(DATA_REG);
 
-    if (data == SCANCODE_L_SHIFT || data == SCANCODE_R_SHIFT)
+    if (data == SCANCODE_L_SHIFT)
     {
-        shift = true;
+        shift_left = true;
         return;
     }
 
-    if (data == RELEASE_L_SHIFT || data == RELEASE_R_SHIFT)
+    if (data == SCANCODE_R_SHIFT)
     {
-        shift = false;
+        shift_right = true;
+        return;
+    }
+
+    if (data == RELEASE_L_SHIFT)
+    {
+        shift_left = false;
+        return;
+    }
+
+    if (data == RELEASE_R_SHIFT)
+    {
+        shift_right = false;
         return;
     }
 
@@ -51,10 +65,18 @@ static void keyboard_handler()
         return;
     }
 
-    int code = data & ~(1UL << 7);
-    int buffer_index = index++ % BUFFER_SIZE;
+    // TODO
+    if ((producer + 1) % BUFFER_SIZE == consumer % BUFFER_SIZE)
+    {
+        // buffer is full I think?
+        term_printf("buffer is full");
+        return;
+    }
 
-    if (shift)
+    int code = data & ~(1UL << 7);
+    int buffer_index = producer++ % BUFFER_SIZE;
+
+    if (shift_left || shift_right)
     {
         buffer[buffer_index] = keymap->shift[code];
     }
@@ -80,8 +102,11 @@ void keyb_init()
 int keyb_get_key()
 {
     // TODO
-    int buffer_index = index-- % BUFFER_SIZE;
-    int key = buffer[buffer_index];
-    buffer[buffer_index] = 0;
-    return key;
+    if (consumer == producer)
+    {
+        return 0;
+    }
+
+    // term_printf("consumer(%d)", consumer);
+    return buffer[consumer++ % BUFFER_SIZE];
 }
