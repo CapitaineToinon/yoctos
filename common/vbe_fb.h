@@ -3,10 +3,9 @@
 
 #include "common/types.h"
 
-typedef struct
-{
+typedef struct {
 	uint16_t *addr;
-	uint32_t size; // in bytes
+	uint32_t size;  // in bytes
 	uint32_t pitch_in_bytes;
 	uint32_t pitch_in_pix;
 	uint32_t width;

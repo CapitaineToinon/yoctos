@@ -3,11 +3,10 @@
 
 #include "common/types.h"
 
-#define IRQ_FIRST 0
-#define IRQ_LAST 15
+#define IRQ_FIRST    0
+#define IRQ_LAST     15
 
-typedef struct
-{
+typedef struct {
 	void (*func)(void);
 	char name[64];
 } handler_t;

@@ -8,8 +8,7 @@
 // Indicate the entry must be ignored
 #define KEY_IGNORE 0x0
 
-typedef struct
-{
+typedef struct {
 	uint16_t normal[MAP_SIZE];
 	uint16_t shift[MAP_SIZE];
 	uint16_t ctrl[MAP_SIZE];

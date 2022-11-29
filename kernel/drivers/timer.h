@@ -1,9 +1,9 @@
 #ifndef _TIMER_H_
 #define _TIMER_H_
 
-#include "pmio/pmio.h"
-
 // Initializes the timer with the specified frequency in Hz.
+// Note that the effective frequency might be different than the desired one.
+// Use timer_get_freq() to obtain the effective frequency.
 extern void timer_init(uint_t freq_hz);
 
 // Returns the number of ticks since boot.

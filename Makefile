@@ -47,6 +47,7 @@ help:
 	@echo "iso      build the OS ISO image (+ filesystem)"
 	@echo "common   build the common object files only"
 	@echo "kernel   build the kernel only"
+	@echo "user     build the user space executables only"
 	@echo "debug    build the OS ISO image (+ filsystem) and run it in QEMU for debugging"
 	@echo "deploy   build the OS ISO image (+ filsystem) and deploy it to the specified device"
 	@echo "         Requires DEV to be defined (eg. DEV=/dev/sdb)"
@@ -81,10 +82,16 @@ debug: $(ISO_NAME)
 # Requires grub-mkrescue and xorriso
 # NOTE: on hosts that boot via UEFI, the path /usr/lib/grub/i386-pc is required
 # by grub-mkrescue otherwise the ISO won't be bootable by qemu.
-$(ISO_NAME): msg $(GRUB_CONF) kernel
-	mkdir -p build/boot/grub build/data/
+$(ISO_NAME): msg $(GRUB_CONF) kernel user
+	mkdir -p build/boot/grub build/bin
 	cp $(GRUB_CONF) build/boot/grub/
 	cp kernel/kernel.elf build/boot/
+	cp user/*.exe build/bin/
+	for f in user/*.exe; do \
+		name=`basename $$f`; \
+		echo "\tmodule /bin/$$name $$name" >> build/boot/grub/grub.cfg; \
+	done
+	echo "}" >> build/boot/grub/grub.cfg
 	grub-mkrescue $(GRUB_MKRESCUE_ARGS) -o $@ build
 	@echo "Built the $@ image for a $(SYSTEM) system."
 
@@ -92,6 +99,9 @@ common:
 	$(MAKE) -C $@ CC_DEFINES=$(CC_DEFINES) CC_FLAGS="$(CC_FLAGS)" LD_FLAGS="$(LD_FLAGS)"
 
 kernel:
+	$(MAKE) -C $@ CC_DEFINES=$(CC_DEFINES) CC_FLAGS="$(CC_FLAGS)" LD_FLAGS="$(LD_FLAGS)"
+
+user:
 	$(MAKE) -C $@ CC_DEFINES=$(CC_DEFINES) CC_FLAGS="$(CC_FLAGS)" LD_FLAGS="$(LD_FLAGS)"
 
 deploy: $(ISO_NAME)
@@ -103,5 +113,6 @@ clean:
 	/bin/rm -rf build $(ISO_NAME)
 	$(MAKE) -C common clean
 	$(MAKE) -C kernel clean
+	$(MAKE) -C user clean
 
-.PHONY: clean common kernel
+.PHONY: clean common kernel user

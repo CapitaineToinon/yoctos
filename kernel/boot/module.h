@@ -26,11 +26,19 @@ extern uint_t module_size(uint_t index);
 // Returns a module's command line.
 // Returns NULL if the module's command line is empty.
 // Note: first module is at index 0.
-extern char *module_cmdline(uint_t index);
+extern char* module_cmdline(uint_t index);
 
 // Displays modules' information:
 // - number of detected modules
 // - for each module: address, size (in bytes), command line
 extern void modules_display_info();
+
+// Returns the address of the first module whose argument matches name.
+// Returns NULL if no such module is found.
+extern void *module_addr_by_name(char *name);
+
+// Returns the size in bytes of the first module whose argument matches name.
+// Returns -1 if no such module is found.
+extern int module_size_by_name(char *name);
 
 #endif

@@ -1,24 +1,19 @@
 #ifndef _X86_H_
 #define _X86_H_
 
-// Disable hardware interrupts.
-static inline void cli()
-{
-	asm volatile("cli");
-}
+// Executes the IRET instruction.
+#define iret() asm volatile("iret")
 
-// Enable hardware interrupts.
-static inline void sti()
-{
-	asm volatile("sti");
-}
+// Disables hardware interrupts.
+#define cli() asm volatile("cli")
+
+// Enables hardware interrupts.
+#define sti() asm volatile("sti")
 
 // Halt the processor.
 // External interrupts wake up the CPU, hence the cli instruction.
-static inline void halt()
-{
-	while (1)
-		asm volatile("cli\nhlt");
+static inline void halt() {
+	while(1) asm volatile("cli\nhlt");
 }
 
 #endif

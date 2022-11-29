@@ -60,16 +60,11 @@ extern %2
     mov     fs,ax
     mov     gs,ax
     
-    ; Save where we're coming from (either from a task or the kernel)
-    str		eax
-	push	eax
-    
     ; Pass the stack pointer (which gives the CPU context) to the C function
     mov     eax,esp
     push    eax    
     call    %2
-    pop     eax  ; only here to balance the two "push eax" done before the call
-    pop		eax
+    pop     eax  ; only here to balance the "push eax" done before the call
 
     ; Restore all registers
     pop     gs
@@ -126,4 +121,3 @@ exception_wout_code   20
 ; exception_handler and irq_handler are implemented in idt.c
 isr_wrapper exception_wrapper,exception_handler
 isr_wrapper irq_wrapper,irq_handler
-

@@ -9,10 +9,10 @@
 // Converts a frame number into a 32-bit address
 #define FRAME_NB_TO_ADDR(n) (((uint32_t)n) << 12)
 
-#define FRAME_SIZE 4096
+#define FRAME_SIZE  4096
 
 // Returns the number of frames required to store the given number of bytes
-#define FRAME_COUNT(size) ((size + FRAME_SIZE - 1) / FRAME_SIZE)
+#define FRAME_COUNT(size) ((size + FRAME_SIZE - 1)/FRAME_SIZE)
 
 // Initializes the physical frame subsystem, using the specified amount of physical memory.
 extern void frame_init(uint_t RAM_in_KB);
@@ -34,4 +34,4 @@ extern void frame_free(void *frame_addr);
 // This is typically used by a syscall to retrieve the amount of free RAM.
 extern uint_t frame_total_free();
 
-#endif
+ #endif
