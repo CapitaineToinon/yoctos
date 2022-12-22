@@ -6,40 +6,50 @@
 #include "syscall.h"
 #include "ld.h"
 
-#define TAB_SIZE  4
+#define TAB_SIZE 4
 
 SECTION_DATA static vbe_fb_t fb;
 
-void sleep(uint_t ms) {
-    syscall(SYSCALL_TIMER_SLEEP, (uint32_t)ms, 0,0,0);
+void sleep(uint_t ms)
+{
+	syscall(SYSCALL_TIMER_SLEEP, (uint32_t)ms, 0, 0, 0);
 }
 
-void read_string(char *buf) {
+void read_string(char *buf)
+{
 	char *start = buf;
-	for (;;) {
+	for (;;)
+	{
 		int c = getc();
-		if (c) {
+		if (c)
+		{
 			// backspace
-			if (c == '\b') {
-				if (buf - start > 0) {
+			if (c == '\b')
+			{
+				if (buf - start > 0)
+				{
 					putc(c);
 					buf--;
 				}
 			}
 			// return
-			else if (c == '\n') {
+			else if (c == '\n')
+			{
 				break;
 			}
 			// tab
-			else if (c == '\t') {
+			else if (c == '\t')
+			{
 				c = ' ';
-				for (int i = 0; i < TAB_SIZE; i++) {
+				for (int i = 0; i < TAB_SIZE; i++)
+				{
 					putc(c);
 					*buf = c;
 					buf++;
 				}
 			}
-			else {
+			else
+			{
 				putc(c);
 				*buf = c;
 				buf++;
@@ -51,9 +61,12 @@ void read_string(char *buf) {
 
 // Return 1 if string str starts with prefix.
 // Return 0 otherwise.
-int starts_with(char *prefix, char *str) {
-	while (*prefix) {
-		if (*str != *prefix) {
+int starts_with(char *prefix, char *str)
+{
+	while (*prefix)
+	{
+		if (*str != *prefix)
+		{
 			return 0;
 		}
 		prefix++;
@@ -62,7 +75,8 @@ int starts_with(char *prefix, char *str) {
 	return 1;
 }
 
-char *trim(char *line) {
+char *trim(char *line)
+{
 	int len;
 
 	// Remove heading spaces.
@@ -71,14 +85,17 @@ char *trim(char *line) {
 
 	// Remove trailing spaces.
 	len = strlen(line);
-	if (len > 0) {
+	if (len > 0)
+	{
 		char *s = line + len - 1;
 		int cut = 0;
-		while (*s == ' ') {
+		while (*s == ' ')
+		{
 			s--;
 			cut = 1;
 		}
-		if (cut) {
+		if (cut)
+		{
 			*(s + 1) = 0;
 		}
 	}

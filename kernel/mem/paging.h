@@ -108,11 +108,10 @@ extern void paging_mmap(PDE_t *pagedir, uint32_t virt_addr, uint32_t phys_addr, 
 extern uint_t paging_alloc(PDE_t *pagedir, PTE_t *page_tables[PAGETABLES_IN_PD], uint32_t virt_addr, uint32_t size, enum privilege_t privilege);
 
 extern PDE_t *paging_get_kernel_pagedir();
-extern void *paging_get_shared_frame_for_tasks();
 
 // Functions below are implemented in paging_asm.s
 extern void paging_enable();
-extern void paging_load_pagedir(uint32_t dir_entry_addr);
+extern void paging_load_pagedir(PDE_t *pagedir);
 extern PDE_t *paging_get_current_pagedir();
 
 #endif

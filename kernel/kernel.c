@@ -14,6 +14,7 @@
 #include "mem/frame.h"
 #include "mem/gdt.h"
 #include "task/task.h"
+#include "syscall/syscall.h"
 #include "x86.h"
 
 // These are defined in the linker script: kernel.ld
@@ -22,7 +23,8 @@ extern void ld_kernel_end();
 uint_t kernel_start = (uint_t)&ld_kernel_start;
 uint_t kernel_end = (uint_t)&ld_kernel_end;
 
-void kernel_main(multiboot_info_t *mbi) {
+void kernel_main(multiboot_info_t *mbi)
+{
     multiboot_set_info(mbi);
     uint_t RAM_in_KB = multiboot_get_RAM_in_KB();
 
@@ -32,14 +34,14 @@ void kernel_main(multiboot_info_t *mbi) {
     vbe_init();
     vbe_fb_t *fb = vbe_get_fb();
 
-    paging_init(RAM_in_KB);  // must be called AFTER vbe_init()!    
+    paging_init(RAM_in_KB); // must be called AFTER vbe_init()!
 
     term_init();
     term_printf("YoctOS started\n");
     term_printf("VBE mode %dx%d %dbpp initialized (addr=0x%x, pitch=%d).\n", fb->width, fb->height, fb->bpp, fb->addr, fb->pitch_in_bytes);
     term_printf("Detected %dKB of RAM.\n", RAM_in_KB);
-    term_printf("%dKB of RAM available.\n", frame_total_free()*FRAME_SIZE/1024);
-    term_printf("Kernel loaded at [0x%x-0x%x], size=%dKB\n", kernel_start, kernel_end, (kernel_end-kernel_start)/1024);
+    term_printf("%dKB of RAM available.\n", frame_total_free() * FRAME_SIZE / 1024);
+    term_printf("Kernel loaded at [0x%x-0x%x], size=%dKB\n", kernel_start, kernel_end, (kernel_end - kernel_start) / 1024);
 
     modules_display_info();
 
@@ -48,12 +50,30 @@ void kernel_main(multiboot_info_t *mbi) {
     keyb_init();
 
     // IMPORTANT: timer frequency must be >= 50
-    int timer_freq = 1000;
+    int timer_freq = 100;
     timer_init(timer_freq);
 
     // Unmask hardware interrupts
     sti();
     term_puts("Interrupts enabled.\n");
+
+    syscall_handler(SYSCALL_TERM_PUTS, (uint32_t) "WESH\n", 0, 0, 0);
+
+    uint_t freq = 0;
+    uint_t ticks = 0;
+    syscall_handler(SYSCALL_TIMER_INFO, (uint32_t)&freq, (uint32_t)&ticks, 0, 0);
+    term_printf("freq = %d ticks = %d\n", freq, ticks);
+
+    syscall_handler(SYSCALL_TIMER_SLEEP, 1000, 0, 0, 0);
+
+    syscall_handler(SYSCALL_TIMER_INFO, (uint32_t)&freq, (uint32_t)&ticks, 0, 0);
+    term_printf("freq = %d ticks = %d\n", freq, ticks);
+
+    tasks_init();
+    if (!task_exec("hello.exe"))
+    {
+        term_printf("failed to exec\n");
+    }
 
     term_printf("\nSystem halted.");
     halt();

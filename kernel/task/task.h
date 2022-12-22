@@ -29,8 +29,6 @@ typedef struct {
 } task_t;
 
 extern void tasks_init();
-extern task_t *task_allocate(char *name, uint_t addr_space_size);
-extern void task_release(task_t *t);
 extern bool task_exec(char *filename);
 
 // Implemented in task_asm.s

@@ -16,6 +16,9 @@ RUN apt-get install -y --no-install-recommends \
     qemu-system-gui \
     gdb
 
+RUN apt-get update && \
+    apt-get install -y grub-common
+
 # Personal stuff
 RUN apt-get install -y --no-install-recommends \
     git \
