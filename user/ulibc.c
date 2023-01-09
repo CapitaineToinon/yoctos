@@ -10,6 +10,24 @@
 
 SECTION_DATA static vbe_fb_t fb;
 
+void vbe_init(uint_t *width, uint_t *height)
+{
+	syscall(SYSCALL_VBE_FB_INFO, (uint32_t)&fb, 0, 0, 0);
+	*width = fb.width;
+	*height = fb.height;
+}
+
+void vbe_setpixel(int x, int y, uint16_t color)
+{
+	uint16_t *pixel = fb.addr + x + (fb.pitch_in_pix * y);
+	*pixel = color;
+}
+
+void vbe_setpixel_syscall(int x, int y, uint16_t color)
+{
+	syscall(SYSCALL_VBE_SETPIX, (uint32_t)x, (uint32_t)y, (uint32_t)color, 0);
+}
+
 void sleep(uint_t ms)
 {
 	syscall(SYSCALL_TIMER_SLEEP, (uint32_t)ms, 0, 0, 0);
