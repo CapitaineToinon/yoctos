@@ -225,9 +225,7 @@ bool task_exec(char *filename)
     }
 
     term_colors_t cols = term_getcolors();
-    term_printf("before switch\n");
     task_switch(t->tss_selector);
-    term_printf("after switch\n");
     term_setcolors(cols);
 
     task_free(t);

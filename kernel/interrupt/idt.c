@@ -158,11 +158,32 @@ extern int _syscall_handler(syscall_t, uint32_t, uint32_t, uint32_t, uint32_t);
 // High-level handler for all exceptions.
 void exception_handler(regs_t *regs)
 {
+    term_colors_t cols = term_getcolors();
+
     term_setfgcolor(YELLOW);
     term_setbgcolor(RED);
-    term_printf("Exception %d triggered by kernel code: %s (error code 0x%x)!\n", regs->number, exception_names[regs->number], regs->error_code);
-    term_printf("Kernel PANIC.\n");
-    halt();
+    term_printf("Exception %d triggered code: %s (error code 0x%x)!", regs->number, exception_names[regs->number], regs->error_code);
+    term_setcolors(cols);
+    term_printf("\n");
+
+    uint16_t current_sel = task_get_current_sel();
+    if (current_sel == KERNEL_TSS_INDEX * sizeof(gdt_entry_t))
+    {
+        // panic when the error happens in the kernel
+        term_setfgcolor(YELLOW);
+        term_setbgcolor(RED);
+        term_printf("Kernel PANIC");
+        term_setcolors(cols);
+        term_printf("\n");
+        halt();
+        return;
+    }
+
+    term_setcolors(cols);
+
+    // otherwise, assume it's a task and attempt to recover
+    uint32_t *next_opcode = (uint32_t *)(regs->eip);
+    *next_opcode = 0xCF; // iret
 }
 
 // High-level handler for all hardware interrupts.

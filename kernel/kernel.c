@@ -60,15 +60,10 @@ void kernel_main(multiboot_info_t *mbi)
     tasks_init();
     term_puts("Tasks enabled.\n");
 
-    syscall_handler(SYSCALL_TASK_EXEC, (uint32_t) "hello.exe", 0, 0, 0);
-    syscall_handler(SYSCALL_TASK_EXEC, (uint32_t) "hello.exe", 0, 0, 0);
-
     if (!task_exec("shell.exe"))
     {
         term_printf("failed to exec\n");
     }
-
-    syscall_handler(SYSCALL_TASK_EXEC, (uint32_t) "hello.exe", 0, 0, 0);
 
     term_printf("\nSystem halted.");
     halt();
