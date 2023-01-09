@@ -104,7 +104,6 @@ static int (*syscall_func[])(uint32_t arg1, uint32_t arg2, uint32_t arg3, uint32
 // Called by the assembly function: _syscall_handler
 int syscall_handler(syscall_t nb, uint32_t arg1, uint32_t arg2, uint32_t arg3, uint32_t arg4)
 {
-	term_printf("print from syscall_handler = %d\n", nb);
 	if (nb < __SYSCALL_END__)
 	{
 		return syscall_func[nb](arg1, arg2, arg3, arg4);

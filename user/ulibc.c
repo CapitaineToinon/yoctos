@@ -15,6 +15,47 @@ void sleep(uint_t ms)
 	syscall(SYSCALL_TIMER_SLEEP, (uint32_t)ms, 0, 0, 0);
 }
 
+int getc()
+{
+	return syscall(SYSCALL_KEYB_GET_KEY, 0, 0, 0, 0);
+}
+
+void putc(char c)
+{
+	char str1[2] = {c, '\0'};
+	puts(str1);
+}
+
+void puts(char *s)
+{
+	syscall(SYSCALL_TERM_PUTS, (uint32_t)s, 0, 0, 0);
+}
+
+bool task_exec(char *filename)
+{
+	return syscall(SYSCALL_TASK_EXEC, (uint32_t)filename, 0, 0, 0);
+}
+
+void printf(char *fmt, ...)
+{
+	char string[512];
+
+	va_list arg_ptr;
+	va_start(arg_ptr, fmt);
+	int size = vsnprintf(string, 512, fmt, arg_ptr);
+	va_end(arg_ptr);
+
+	if (size <= 0)
+		return;
+
+	puts(string);
+}
+
+void timer_info(uint_t *freq, uint_t *ticks)
+{
+	syscall(SYSCALL_TIMER_INFO, (uint32_t)freq, (uint32_t)ticks, 0, 0);
+}
+
 void read_string(char *buf)
 {
 	char *start = buf;

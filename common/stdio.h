@@ -2,6 +2,7 @@
 #define _STDIO_COMMON_H_
 
 #include <stdarg.h>
+#include "stdio.h"
 
 // Writes at most size characters (including terminal 0) of the formatted string fmt
 // into buffer dest.

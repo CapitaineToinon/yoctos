@@ -57,23 +57,18 @@ void kernel_main(multiboot_info_t *mbi)
     sti();
     term_puts("Interrupts enabled.\n");
 
-    syscall_handler(SYSCALL_TERM_PUTS, (uint32_t) "WESH\n", 0, 0, 0);
-
-    uint_t freq = 0;
-    uint_t ticks = 0;
-    syscall_handler(SYSCALL_TIMER_INFO, (uint32_t)&freq, (uint32_t)&ticks, 0, 0);
-    term_printf("freq = %d ticks = %d\n", freq, ticks);
-
-    syscall_handler(SYSCALL_TIMER_SLEEP, 1000, 0, 0, 0);
-
-    syscall_handler(SYSCALL_TIMER_INFO, (uint32_t)&freq, (uint32_t)&ticks, 0, 0);
-    term_printf("freq = %d ticks = %d\n", freq, ticks);
-
     tasks_init();
-    if (!task_exec("hello.exe"))
+    term_puts("Tasks enabled.\n");
+
+    syscall_handler(SYSCALL_TASK_EXEC, (uint32_t) "hello.exe", 0, 0, 0);
+    syscall_handler(SYSCALL_TASK_EXEC, (uint32_t) "hello.exe", 0, 0, 0);
+
+    if (!task_exec("shell.exe"))
     {
         term_printf("failed to exec\n");
     }
+
+    syscall_handler(SYSCALL_TASK_EXEC, (uint32_t) "hello.exe", 0, 0, 0);
 
     term_printf("\nSystem halted.");
     halt();

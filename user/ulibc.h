@@ -1,12 +1,13 @@
 #ifndef _ULIBC_H_
 #define _ULIBC_H_
 
+#include <stdarg.h>
 #include "common/types.h"
 #include "common/colors.h"
 #include "common/string.h"
 
 extern bool task_exec(char *filename);
-extern void exit();  // defined in entrypoint_asm.s
+extern void exit(); // defined in entrypoint_asm.s
 
 extern void timer_info(uint_t *freq, uint_t *ticks);
 extern uint_t get_ticks();

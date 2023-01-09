@@ -152,6 +152,9 @@ static char *exception_names[EXCEPTION_COUNT] = {
     "SIMD Exception",
     "Virtualization Exception"};
 
+// from syscall_asm.s
+extern int _syscall_handler(syscall_t, uint32_t, uint32_t, uint32_t, uint32_t);
+
 // High-level handler for all exceptions.
 void exception_handler(regs_t *regs)
 {
@@ -216,7 +219,7 @@ void idt_init()
 
     // TODO
     // Add IDT entry 48: system call
-    idt[48] = idt_build_entry(GDT_KERNEL_CODE_SELECTOR, (uint32_t)syscall_handler, TYPE_TRAP_GATE, DPL_USER);
+    idt[48] = idt_build_entry(GDT_KERNEL_CODE_SELECTOR, (uint32_t)&_syscall_handler, TYPE_TRAP_GATE, DPL_USER);
 
     // Loads the IDT.
     idt_load(&idt_ptr);

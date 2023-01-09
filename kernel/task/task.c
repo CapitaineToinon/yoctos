@@ -16,7 +16,7 @@
 static task_t tasks[MAX_TASK_COUNT];
 static tss_t initial_tss;
 static uint8_t initial_tss_kernel_stack[65536];
-static uint_t task_id = 1; // incremented whenever a new task is created
+static uint_t task_id = 0; // incremented whenever a new task is created
 
 // Template page directory for all tasks.
 // Since it will never be loaded as a page directory, there is no need to align it to 4KB.
@@ -27,7 +27,7 @@ static task_t *next_free_task()
 {
     for (uint8_t i = 0; i < MAX_TASK_COUNT; i++)
     {
-        if (!tasks[i].in_use)
+        if (tasks[i].in_use == false)
         {
             term_printf("found space as %d\n", i);
             return &tasks[i];
@@ -53,23 +53,24 @@ static task_t *task_create(char *name, uint_t addr_space_size)
         return NULL;
     }
 
+    memset(t, 0, sizeof(t));
+
     // Look for a free task and if found:
     // - initializes the task's fields
     t->id = task_id++;
     t->in_use = true;
 
+    t->addr_space_size = addr_space_size;
+    uint_t full_task_space_size = t->addr_space_size + (TASK_STACK_SIZE_MB * 1024 * 1024);
+
     // Tasks GDT entries start at gdt_first_task_entry (each task uses one GDT entry)
     extern gdt_entry_t *gdt_first_task_entry;
-    gdt_entry_t *gdt_task_tss = gdt_first_task_entry;
-
-    uint_t full_task_space_size = addr_space_size + (TASK_STACK_SIZE_MB * 1024 * 1024);
-
+    gdt_entry_t *gdt_task_tss = gdt_first_task_entry + t->id;
     // - initializes its GDT entry and TSS selector
     // - initializes its TSS structure
     int gdt_tss_sel = gdt_entry_to_selector(gdt_task_tss);
     *gdt_task_tss = gdt_make_tss(&t->tss, DPL_KERNEL);
     t->tss_selector = gdt_tss_sel;
-
     term_printf("t->tss_selector = %d\n", t->tss_selector);
 
     // setup initial task context
@@ -89,8 +90,10 @@ static task_t *task_create(char *name, uint_t addr_space_size)
 
     // - allocates its address space using the "paging_alloc" function
     uint_t alloc_frame_count = paging_alloc(t->pagedir, t->page_tables, TASK_VIRT_ADDR, full_task_space_size, PRIVILEGE_USER);
-    term_printf("Allocated %dKB of RAM for task %d (\"%s\")\n", alloc_frame_count * PAGE_SIZE / 1024, t->id, name);
-
+    term_printf("Allocated %dKB of RAM (%d frames) for task %d (\"%s\")\n",
+                alloc_frame_count * PAGE_SIZE / 1024,
+                alloc_frame_count,
+                t->id, name);
     return t;
 }
 
@@ -110,17 +113,28 @@ static void task_free(task_t *t)
     uint32_t alloc_frame_count = 0;
     uint32_t alloc_pt_count = 0;
 
-    for (uint_t pt = 0; t->page_tables[pt]; pt++)
+    for (uint_t i = 0; t->page_tables[i]; i++)
     {
-        if (!t->page_tables[pt]->present)
+        PTE_t *page_table = t->page_tables[i];
+
+        for (int j = 0; j < PAGES_IN_PT; j++)
         {
-            continue;
+            PTE_t page_entry = page_table[j];
+
+            if (!page_entry.present)
+            {
+                continue;
+            }
+
+            frame_free((void *)FRAME_NB_TO_ADDR(page_entry.frame_base_addr));
+            alloc_frame_count++;
         }
 
-        // frame_free(t->page_tables[pt]->frame_base_addr);
+        alloc_pt_count++;
     }
 
     t->in_use = false;
+    task_id--;
 
     term_printf("Freed %dKB of RAM (%d page table(s), %d frames)\n",
                 (alloc_frame_count)*PAGE_SIZE / 1024,
@@ -216,6 +230,6 @@ bool task_exec(char *filename)
     term_printf("after switch\n");
     term_setcolors(cols);
 
-    // task_free(t);
+    task_free(t);
     return true;
 }

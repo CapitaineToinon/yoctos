@@ -10,10 +10,9 @@ USER_ASM_OBJ=$(USER_ASM_SRC:.s=.o)
 
 DEP=$(USER_C_OBJ:%.o=%.d)
 
-# APP_DEP=entrypoint_asm.o syscall_asm.o ulibc.o $(COMMON_OBJ)
-APP_DEP=entrypoint_asm.o syscall_asm.o $(COMMON_OBJ)
+APP_DEP=entrypoint_asm.o syscall_asm.o ulibc.o $(COMMON_OBJ)
 
-APPS=hello.exe # shell.exe gpf.exe pagefault.exe pix.exe
+APPS=hello.exe shell.exe gpf.exe pagefault.exe pix.exe
 
 all: $(APPS)
 
