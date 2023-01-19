@@ -1,5 +1,6 @@
 #include "common/types.h"
 #include "common/mem.h"
+#include "task/task.h"
 #include "gdt.h"
 #include "descriptors.h"
 
@@ -26,19 +27,19 @@ typedef struct gdt_ptr_st {
 // Implemented in gdt_asm.s
 extern void gdt_load(gdt_ptr_t *gdt_ptr);
 
-// 6 because of these first 6 descriptors:
+// The first five GDT entries are used for:
 //   0: NULL
 //   1: kernel code
 //   2: kernel data
 //   3: user code
 //   4: user data
-//   5: initial tss
-static gdt_entry_t gdt[6];
+static gdt_entry_t gdt[KERNEL_TSS_INDEX+1+MAX_TASK_COUNT];
 static gdt_ptr_t gdt_ptr;
 
-// Used in future task code
-gdt_entry_t *gdt_initial_tss = &gdt[5];
-gdt_entry_t *gdt_first_free_entry = &gdt[6];
+// Entries from index 5 on are used to store tasks' TSS (see task.c),
+// starting with the initial TSS for the kernel.
+gdt_entry_t *gdt_initial_tss = &gdt[KERNEL_TSS_INDEX];
+gdt_entry_t *gdt_first_task_entry = &gdt[KERNEL_TSS_INDEX+1];
 
 // Build and return a GDT entry.
 // base is the base of the segment

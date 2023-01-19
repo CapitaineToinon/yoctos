@@ -3,6 +3,9 @@
 
 #include "task/tss.h"
 
+#define KERNEL_TSS_INDEX (5)
+#define KERNEL_TSS_SEL (KERNEL_TSS_INDEX*8)
+
 // kernel code and data selectors in the GDT
 #define GDT_KERNEL_CODE_SELECTOR   (8 | DPL_KERNEL)
 #define GDT_KERNEL_DATA_SELECTOR  (16 | DPL_KERNEL)

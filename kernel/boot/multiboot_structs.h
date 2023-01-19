@@ -3,14 +3,13 @@
 
 // Source: https://www.gnu.org/software/grub/manual/multiboot/multiboot.html#multiboot_002eh
 
-typedef unsigned char multiboot_uint8_t;
-typedef unsigned short multiboot_uint16_t;
-typedef unsigned int multiboot_uint32_t;
-typedef unsigned long long multiboot_uint64_t;
+typedef unsigned char           multiboot_uint8_t;
+typedef unsigned short          multiboot_uint16_t;
+typedef unsigned int            multiboot_uint32_t;
+typedef unsigned long long      multiboot_uint64_t;
 
 /* The symbol table for a.out. */
-struct multiboot_aout_symbol_table
-{
+struct multiboot_aout_symbol_table {
 	multiboot_uint32_t tabsize;
 	multiboot_uint32_t strsize;
 	multiboot_uint32_t addr;
@@ -19,8 +18,7 @@ struct multiboot_aout_symbol_table
 typedef struct multiboot_aout_symbol_table multiboot_aout_symbol_table_t;
 
 /* The section header table for ELF. */
-struct multiboot_elf_section_header_table
-{
+struct multiboot_elf_section_header_table {
 	multiboot_uint32_t num;
 	multiboot_uint32_t size;
 	multiboot_uint32_t addr;
@@ -28,8 +26,7 @@ struct multiboot_elf_section_header_table
 };
 typedef struct multiboot_elf_section_header_table multiboot_elf_section_header_table_t;
 
-struct multiboot_info
-{
+struct multiboot_info {
 	/* Multiboot info version number */
 	multiboot_uint32_t flags;
 
@@ -47,8 +44,7 @@ struct multiboot_info
 	multiboot_uint32_t mods_count;
 	multiboot_uint32_t mods_addr;
 
-	union
-	{
+	union {
 		multiboot_aout_symbol_table_t aout_sym;
 		multiboot_elf_section_header_table_t elf_sec;
 	} u;
@@ -77,27 +73,24 @@ struct multiboot_info
 	multiboot_uint16_t vbe_interface_seg;
 	multiboot_uint16_t vbe_interface_off;
 	multiboot_uint16_t vbe_interface_len;
-
+	
 	multiboot_uint64_t framebuffer_addr;
-	// Pitch is the distance, in bytes, between two memory addresses that represent
-	// the beginning of one bitmap line and the beginning of the next bitmap line.
+    // Pitch is the distance, in bytes, between two memory addresses that represent
+    // the beginning of one bitmap line and the beginning of the next bitmap line.
 	multiboot_uint32_t framebuffer_pitch;
 	multiboot_uint32_t framebuffer_width;
 	multiboot_uint32_t framebuffer_height;
 	multiboot_uint8_t framebuffer_bpp;
-#define MULTIBOOT_FRAMEBUFFER_TYPE_INDEXED 0
-#define MULTIBOOT_FRAMEBUFFER_TYPE_RGB 1
-#define MULTIBOOT_FRAMEBUFFER_TYPE_EGA_TEXT 2
+#define MULTIBOOT_FRAMEBUFFER_TYPE_INDEXED   0
+#define MULTIBOOT_FRAMEBUFFER_TYPE_RGB       1
+#define MULTIBOOT_FRAMEBUFFER_TYPE_EGA_TEXT  2
 	multiboot_uint8_t framebuffer_type;
-	union
-	{
-		struct
-		{
+	union {
+		struct {
 			multiboot_uint32_t framebuffer_palette_addr;
 			multiboot_uint16_t framebuffer_palette_num_colors;
 		};
-		struct
-		{
+		struct {
 			multiboot_uint8_t framebuffer_red_field_position;
 			multiboot_uint8_t framebuffer_red_mask_size;
 			multiboot_uint8_t framebuffer_green_field_position;
@@ -109,8 +102,7 @@ struct multiboot_info
 };
 typedef struct multiboot_info multiboot_info_t;
 
-struct multiboot_mod_list
-{
+struct multiboot_mod_list {
 	/* the memory used goes from bytes 'mod_start' to 'mod_end-1' inclusive */
 	multiboot_uint32_t mod_start;
 	multiboot_uint32_t mod_end;
@@ -121,7 +113,6 @@ struct multiboot_mod_list
 	/* padding to take it to 16 bytes (must be zero) */
 	multiboot_uint32_t pad;
 };
-
 typedef struct multiboot_mod_list multiboot_module_t;
 
 #endif
